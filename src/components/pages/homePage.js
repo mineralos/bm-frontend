@@ -158,6 +158,7 @@ class Homepage extends Component {
     } else {
       var accepted=0,rejected=0,hwErrors=0,mHs=0,upTime=0,fansSpeed=0;
       var page=this;
+      var fansType="%";
       var postData = {
 
       };
@@ -176,6 +177,14 @@ class Homepage extends Component {
           upTime=chains[0]['Device Elapsed']*1000;
           if ("HARDWARE" in res.data && "Fan duty" in res.data.HARDWARE && parseInt(res.data.HARDWARE["Fan duty"])>0) {
             fansSpeed=res.data.HARDWARE["Fan duty"];
+          } else if ("HARDWARE" in res.data && "Fan duty" in res.data.HARDWARE && typeof res.data.HARDWARE["Fan duty"] === "object") {
+            const fans = Object.values(res.data.HARDWARE["Fan duty"]);
+            var totalRPM = 0;
+            for (var i = 0; i < fans.length; i++) {
+              totalRPM += fans[i]
+            }
+            fansSpeed = totalRPM/fans.length;
+            fansType=" RPM";
           }
           chains.forEach(function(chain)  {
             if ("DUTY" in chain&&parseInt(chain['DUTY'])>0) {
@@ -186,7 +195,7 @@ class Homepage extends Component {
             hwErrors+=parseInt(chain["Hardware Errors"]);
             mHs+=parseFloat(chain["Hash Rate"]);
           });
-          const summary = {"accepted":accepted,"rejected": rejected, "hwErrors":hwErrors, "mHs":mHs, "upTime":upTime, "fansSpeed":fansSpeed}
+          const summary = {"accepted":accepted,"rejected": rejected, "hwErrors":hwErrors, "mHs":mHs, "upTime":upTime, "fansSpeed":fansSpeed, "fansType":fansType}
           const pools = res.data.POOLS;
           this.setState({
             pools: pools,
@@ -374,7 +383,7 @@ class Homepage extends Component {
                           {!summary.fansSpeed && <div className="lds-dual-ring"></div>}
                           {summary.fansSpeed &&
                           <p className="card-text">
-                           {summary.fansSpeed+"%"}
+                           {summary.fansSpeed+summary.fansType}
                           </p>
                           }
                         </div>
