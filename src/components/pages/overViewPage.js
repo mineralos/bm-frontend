@@ -8,7 +8,7 @@ class OverViewpage extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
+    this.state = ({
       type:"",
       version:["build_date": "",
         "ethaddr": "",
@@ -29,7 +29,7 @@ class OverViewpage extends Component {
         "cacheTotal": ""],
       isLoaded: false,
       redirectToLogin:false
-    };
+    });
 
   }
 
